@@ -57,6 +57,7 @@ public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport impleme
 
     JPQLQuery<Board> jpqlQuery = from(board);
     jpqlQuery.leftJoin(reply).on(reply.board.eq(board));
+    jpqlQuery.select(board).where(board.bno.eq(1L));
 
     /*
       select board
@@ -121,6 +122,8 @@ public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport impleme
     BooleanExpression expression = board.bno.gt(0L);
 
     booleanBuilder.and(expression);
+    //type.split(""); -> 문자를 하나씩 나눔 ex) Hello -> H, e, l, l, o
+    //type.split(" "); -> 공백을 기준으로 나눔 ex) Hel lo -> Hel, lo
 
     if (type != null) {
       String[] typeArr = type.split("");
