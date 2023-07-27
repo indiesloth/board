@@ -118,7 +118,8 @@ class BoardRepositoryTests {
   @Test
   public void testSearchPage() {
 
-    Pageable pagealbe = PageRequest.of(0, 10, Sort.by("bno").descending());
+    Pageable pagealbe = PageRequest.of(0, 10,
+        Sort.by("bno").descending().and(Sort.by("title").ascending()));
 
     Page<Object[]> result = boardRepository.searchPage("t", "1", pagealbe);
 

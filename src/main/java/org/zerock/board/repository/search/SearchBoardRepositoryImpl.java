@@ -1,9 +1,11 @@
 package org.zerock.board.repository.search;
 
 import com.querydsl.core.*;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.*;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPQLQuery;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -103,7 +105,6 @@ public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport impleme
 
   @Override
   public Page<Object[]> searchPage(String type, String keyword, Pageable pageable) {
-
     log.info("searchPage....................");
 
     QBoard board = QBoard.board;
@@ -114,20 +115,13 @@ public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport impleme
     jpqlQuery.leftJoin(member).on(board.writer.eq(member));
     jpqlQuery.leftJoin(reply).on(reply.board.eq(board));
 
-    //SELECT b, w, count(r) FROM Board b
-    //LEFT JOIN b.writer w LEFT JOIN Reply r ON r.board = b
     JPQLQuery<Tuple> tuple = jpqlQuery.select(board, member, reply.count());
 
     BooleanBuilder booleanBuilder = new BooleanBuilder();
-    BooleanExpression expression = board.bno.gt(0L);
+    booleanBuilder.and(board.bno.gt(0L));
 
-    booleanBuilder.and(expression);
-    //type.split(""); -> 문자를 하나씩 나눔 ex) Hello -> H, e, l, l, o
-    //type.split(" "); -> 공백을 기준으로 나눔 ex) Hel lo -> Hel, lo
-
-    if (type != null) {
+    if (type != null && !type.isEmpty()) {
       String[] typeArr = type.split("");
-      //검색 조건을 저장하기
       BooleanBuilder conditionBuilder = new BooleanBuilder();
 
       for (String t : typeArr) {
@@ -148,12 +142,24 @@ public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport impleme
 
     tuple.where(booleanBuilder);
 
+    pageable.getSort().stream().forEach(order -> {
+      Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+      String prop = order.getProperty();
+      PathBuilder orderByExpression = new PathBuilder(Board.class, "board");
+      tuple.orderBy(new OrderSpecifier<>(direction, orderByExpression.get(prop)));
+    });
+
     tuple.groupBy(board);
+    tuple.offset(pageable.getOffset());
+    tuple.limit(pageable.getPageSize());
 
     List<Tuple> result = tuple.fetch();
-
     log.info(result);
 
-    return null;
+    long count = tuple.fetchCount();
+    log.info("COUNT: " + count);
+
+    return new PageImpl<>(
+        result.stream().map(Tuple::toArray).collect(Collectors.toList()), pageable, count);
   }
 }

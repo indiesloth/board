@@ -7,43 +7,103 @@
 
     <div class="form-group">
       <label>Bno</label>
-      <input type="text" class="form-control" name="bno" th:value="${dto.bno}" readonly>
+      <input class="form-control" name="bno" readonly th:value="${dto.bno}" type="text">
     </div>
 
     <div class="form-group">
       <label>Title</label>
-      <input type="text" class="form-control" name="title" th:value="${dto.title}" readonly>
+      <input class="form-control" name="title" readonly th:value="${dto.title}" type="text">
     </div>
 
     <div class="form-group">
       <label>Content</label>
-      <textarea class="form-control" rows="5" name="content" readonly>[[${dto.content}]]</textarea>
+      <textarea class="form-control" name="content" readonly rows="5">[[${dto.content}]]</textarea>
     </div>
 
     <div class="form-group">
       <label>Writer</label>
-      <input type="text" class="form-control" name="writerName" th:value="${dto.writerName}" readonly>
+      <input class="form-control" name="writerName" readonly th:value="${dto.writerName}"
+             type="text">
     </div>
 
     <div class="form-group">
       <label>RegDate</label>
-      <input type="text" class="form-control" name="regDate"
-             th:value="${#temporals.format(dto.regDate, 'yyyy/MM/dd HH:mm:ss')}" readonly>
+      <input class="form-control" name="regDate" readonly
+             th:value="${#temporals.format(dto.regDate, 'yyyy/MM/dd HH:mm:ss')}" type="text">
     </div>
 
     <div class="form-group">
       <label>ModDate</label>
-      <input type="text" class="form-control" name="modDate"
-             th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd HH:mm:ss')}" readonly>
+      <input class="form-control" name="modDate" readonly
+             th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd HH:mm:ss')}" type="text">
     </div>
 
     <a th:href="@{/board/modify(bno = ${dto.bno}, page = ${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">
-      <button type="button" class="btn btn-primary">Modify</button>
+      <button class="btn btn-primary" type="button">Modify</button>
     </a>
 
     <a th:href="@{/board/list(page = ${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">
-      <button type="button" class="btn btn-info">List</button>
+      <button class="btn btn-info" type="button">List</button>
     </a>
+
+    <div>
+      <div class="mt-4">
+        <h5><span class="badge badge-secondary replyCount">Reply Count [[${dto.replyCount}]]</span>
+        </h5>
+      </div>
+      <div class="list-group replyList">
+
+      </div>
+    </div>
+    <script th:inline="javascript">
+      $(document).ready(function () {
+        var bno = [[${dto.bno}]];
+        //댓글이 추가될 영역
+        var listGroup = $('.replyList');
+
+        //날짜 처리를 위한 함수
+        function formatTime(str) {
+          var date = new Date(str);
+
+          return date.getFullYear() + '/' +
+              (date.getMonth() + 1) + '/' +
+              date.getDate() + ' ' +
+              date.getHours() + ':' +
+              date.getMinutes();
+        }
+
+        //특정한 게시글의 댓글을 처리하는 함수
+        function loadJSONData() {
+
+          let tmpl = $.templates('#listTmpl');
+          $.getJSON('/replies/board/' + bno, function (arr) {
+            var str = '';
+
+            $.each(arr, function (idx, reply) {
+              listGroup.append(tmpl.render({
+                'rno'    : reply.rno,
+                'text'   : reply.text,
+                'replyer': reply.replyer,
+                'regDate': formatTime(reply.regDate),
+              }));
+            });
+          });
+        }
+
+        $('.replyCount').on('click', function () {
+          loadJSONData();
+        });
+
+      });//end script
+    </script>
+
+    <script id="listTmpl" type="text/x-jsrender">
+      <div class="card-body" data-rno={{:rno}}><b>{{:rno}}</b>
+        <h5 class="card-title">{{:text}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{:replyer}}</h6>
+        <p class="cart-text">{{:regDate}}</p>
+      </div>
+    </script>
 
   </th:block>
 </th:block>
