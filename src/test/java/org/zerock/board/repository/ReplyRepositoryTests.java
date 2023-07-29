@@ -47,4 +47,9 @@ class ReplyRepositoryTests {
 
     replyList.forEach(System.out::println);
   }
+
+  @Test
+  public void testCountReply() {
+    System.out.println("ReplyCount : " + replyRepository.findByBnoWithCount(98L));
+  }
 }

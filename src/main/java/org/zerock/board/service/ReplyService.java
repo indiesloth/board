@@ -5,10 +5,16 @@ import org.zerock.board.dto.ReplyDTO;
 import org.zerock.board.entity.*;
 
 public interface ReplyService {
+
   Long register(ReplyDTO replyDTO);
+
   List<ReplyDTO> getList(Long bno);
+
   void modify(ReplyDTO replyDTO);
+
   void remove(Long rno);
+
+  Integer findByBnoWithCount(Long bno);
 
   default Reply dtoToEntity(ReplyDTO replyDTO) {
     Board board = Board.builder().bno(replyDTO.getBno()).build();

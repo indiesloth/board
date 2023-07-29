@@ -11,4 +11,7 @@ public interface ReplyRepository extends AbstractRepository<Reply, Long> {
   void deleteByBno(Long bno);
 
   List<Reply> getRepliesByBoardOrderByRno(Board board);
+
+  @Query("select count(*) from Reply r where r.board.bno = :bno")
+  Integer findByBnoWithCount(Long bno);
 }

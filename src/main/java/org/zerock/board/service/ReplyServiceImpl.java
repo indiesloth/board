@@ -41,4 +41,9 @@ public class ReplyServiceImpl implements ReplyService {
   public void remove(Long rno) {
     replyRepository.deleteById(rno);
   }
+
+  @Override
+  public Integer findByBnoWithCount(Long bno) {
+    return replyRepository.findByBnoWithCount(bno);
+  }
 }
