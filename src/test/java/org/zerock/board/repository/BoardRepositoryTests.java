@@ -1,20 +1,14 @@
 package org.zerock.board.repository;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.zerock.board.entity.Board;
-import org.zerock.board.entity.Member;
+import org.springframework.data.domain.*;
+import org.zerock.board.entity.*;
 
 @SpringBootTest
 class BoardRepositoryTests {
