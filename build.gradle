@@ -42,6 +42,7 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+    implementation 'net.coobird:thumbnailator:0.4.20'
 
 }
 
